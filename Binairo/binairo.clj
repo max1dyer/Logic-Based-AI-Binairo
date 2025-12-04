@@ -591,4 +591,4 @@
    76 (not X63)
    77 (not X64)
  }
- :goal        }
+ :goal        (and (not X13) X14 (not X15) X16 X21 (not X22) X23 (not X26) X31 (not X32) X34 (not X35) X36 (not X41) X43 X44 X51 (not X52) X53 X54 (not X55) (not X61) X62 X65 X66)}
