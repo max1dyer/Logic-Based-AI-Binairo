@@ -1,0 +1,1 @@
+binairo(Board, Length) :- # find valid boards
