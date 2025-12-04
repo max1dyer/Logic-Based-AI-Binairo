@@ -29,3 +29,12 @@ no_triplets([A, B, C | Remainder]) :-
     \+ triplet_equal(A, B, C),          % check first three elements are not equal
     no_triplets([B, C | Remainder]).    % remove first element and check rest of list
 triplet_equal(A, A, A).
+
+% constrain the board so all rows are unique and all columns are unique
+uniqueness_constraint(Rows, Cols) :-
+    unique(Rows),
+    unique(Cols).
+unique([]).
+unique([List1 | Remainder]) :-
+    \+ member(List1, Remainder),        % check if no other list matches List1
+    unique(Remainder).                  % recurse through the rest of the lists
