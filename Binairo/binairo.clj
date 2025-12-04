@@ -1,73 +1,73 @@
 {:name        "Binairo 6x6 Puzzle 1"
  :description "Simple 6x6 Binairo encoding with some givens"
  :assumptions {
-   ;; --- No three 1s in a row, row 1 ---
+   ;; --- No three 1s in row 1 ---
    1  (and (not (and X11 X12 X13)) 
 	   (not (and X12 X13 X14)) 
            (not (and X13 X14 X15)) 
 	   (not (and X14 X15 X16)))
 
-   ;; --- No three 1s in a row, row 2 ---
+   ;; --- No three 1s in row 2 ---
    2  (and (not (and X21 X22 X23)) 
 	   (not (and X22 X23 X24)) 
 	   (not (and X23 X24 X25)) 
 	   (not (and X24 X25 X26)))
 
-   ;; --- No three 1s in a row, row 3 ---
+   ;; --- No three 1s in row 3 ---
    3  (and (not (and X31 X32 X33)) 
 	   (not (and X32 X33 X34)) 
 	   (not (and X33 X34 X35)) 
 	   (not (and X34 X35 X36)))
 
-   ;; --- No three 1s in a row, row 4 ---
+   ;; --- No three 1s in row 4 ---
    4  (and (not (and X41 X42 X43)) 
 	   (not (and X42 X43 X44)) 
 	   (not (and X43 X44 X45)) 
 	   (not (and X44 X45 X46)))
 
-   ;; --- No three 1s in a row, row 5 ---
+   ;; --- No three 1s in row 5 ---
    5  (and (not (and X51 X52 X53)) 
 	   (not (and X52 X53 X54)) 
 	   (not (and X53 X54 X55)) 
 	   (not (and X54 X55 X56)))
 
-   ;; --- No three 1s in a row, row 6 ---
+   ;; --- No three 1s in row 6 ---
    6  (and (not (and X61 X62 X63)) 
 	   (not (and X62 X63 X64)) 
 	   (not (and X63 X64 X65)) 
 	   (not (and X64 X65 X66)))
 
-   ;; --- No three 0s in a row, row 1 ---
+   ;; --- No three 0s in row 1 ---
    7  (and (not (and (not X11) (not X12) (not X13))) 
 	   (not (and (not X12) (not X13) (not X14))) 
 	   (not (and (not X13) (not X14) (not X15))) 
 	   (not (and (not X14) (not X15) (not X16))))
 
-   ;; --- No three 0s in a row, row 2 ---
+   ;; --- No three 0s in row 2 ---
    8  (and (not (and (not X21) (not X22) (not X23))) 
 	   (not (and (not X22) (not X23) (not X24))) 
 	   (not (and (not X23) (not X24) (not X25))) 
 	   (not (and (not X24) (not X25) (not X26))))
 
-   ;; --- No three 0s in a row, row 3 ---
+   ;; --- No three 0s in row 3 ---
    9  (and (not (and (not X31) (not X32) (not X33))) 
 	   (not (and (not X32) (not X33) (not X34))) 
 	   (not (and (not X33) (not X34) (not X35))) 
 	   (not (and (not X34) (not X35) (not X36))))
 
-   ;; --- No three 0s in a row, row 4 ---
+   ;; --- No three 0s in row 4 ---
    10 (and (not (and (not X41) (not X42) (not X43))) 
 	   (not (and (not X42) (not X43) (not X44))) 
 	   (not (and (not X43) (not X44) (not X45))) 
 	   (not (and (not X44) (not X45) (not X46))))
 
-   ;; --- No three 0s in a row, row 5 ---
+   ;; --- No three 0s in row 5 ---
    11 (and (not (and (not X51) (not X52) (not X53))) 
 	   (not (and (not X52) (not X53) (not X54))) 
 	   (not (and (not X53) (not X54) (not X55))) 
 	   (not (and (not X54) (not X55) (not X56))))
 
-   ;; --- No three 0s in a row, row 6 ---
+   ;; --- No three 0s in row 6 ---
    12 (and (not (and (not X61) (not X62) (not X63))) 
 	   (not (and (not X62) (not X63) (not X64))) 
 	   (not (and (not X63) (not X64) (not X65))) 
