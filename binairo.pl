@@ -4,18 +4,28 @@
 % Rows is a list of list where [[1,1],[0,1]] would translate to a board of
 % 1 1
 % 0 1
+
 binairo(Rows, Dimension) :- 
     length(Rows, Dimension),                % number of rows is equal to the Dimension
     maplist(same_length(Dimension), Rows),  % ensure all lists are of length Dimension / number of columns is equal to the Dimension
-    transpose(Rows, Cols).                  % creates list of lists to represent columns
-    
-    % constrain rows and columns to not allow three in a row of 1s or 0s
-    maplist(constrain_three(Row), Rows),
-    maplist(constrain_three(Col), Cols).
+    transpose(Rows, Cols),                  % creates list of lists to represent columns
+
+    % constrain rows and columns to not allow three in a row of 1s or 0
+    triplet_constraint(Rows, Cols),
+    equality_constraint(Rows, Cols),
+    uniqueness_constraint(Rows, Cols).
 
 % check if List is length L
-same_length(L, List) :- is_list(List),
-                        length(List, L).
+same_length(L, List) :-
+    is_list(List),
+    length(List, L).
 
-% to do - ensure no row/column has three 1s or 0s in a line
-constrain_three(List) :- % TO DO
+% constrain the board so there are no triplets
+triplet_constraint(Rows, Cols) :-
+    maplist(no_triplets, Rows),
+    maplist(no_triplets, Cols).
+no_triplets([_, _]).                    % base case -- lists of length 2 cannot have triplets
+no_triplets([A, B, C | Remainder]) :- 
+    \+ triplet_equal(A, B, C),          % check first three elements are not equal
+    no_triplets([B, C | Remainder]).    % remove first element and check rest of list
+triplet_equal(A, A, A).
