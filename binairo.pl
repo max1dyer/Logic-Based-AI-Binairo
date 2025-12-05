@@ -11,10 +11,10 @@ test() :-
     maplist(portray_clause, Solution).
 
 puzzle(1, [
-    [1, _, _, 0],
+    [0, 0, _, _],
+    [0, _, _, 1],
     [_, _, _, _],
-    [_, _, _, _],
-    [0, _, _, 1]
+    [_, 1, _, _]
 ]).
 
 binairo(Rows, Dimension, Solution) :- 
@@ -26,7 +26,7 @@ binairo(Rows, Dimension, Solution) :-
     % constrain rows and columns to not allow three in a row of 1s or 0
     triplet_constraint(Rows, Cols),
     equality_constraint(Rows, Cols),
-    % uniqueness_constraint(Rows, Cols),
+    uniqueness_constraint(Rows, Cols),
 
     Solution = Rows.
 
@@ -56,7 +56,6 @@ limit_half(List) :-
     count(1, List, Count1),
     Count0 #= Count1.
 
-compare_counts(CountA, CountB) :- CountA =:= CountB.
 count(_, [], 0).
 count(Var, [X|Remainder], Count) :- 
     X #= Var,
@@ -68,10 +67,16 @@ count(Var, [X|Remainder], Count) :-
 
 % constrain the board so all rows are unique and all columns are unique
 uniqueness_constraint(Rows, Cols) :-
-    unique(Rows),
-    unique(Cols).
+    unique_list_of_lists(Rows),
+    unique_list_of_lists(Cols).
 
-unique([]).
-unique([List1 | Remainder]) :-
-    \+ member(List1, Remainder),        % check if no other list matches List1
-    unique(Remainder).                  % recurse through the rest of the lists
+unique_list_of_lists([_]).
+unique_list_of_lists([CurrentList | Remainder]) :-
+    maplist(lists_not_equal(CurrentList), Remainder),   % check CurrentList against the remaining lists
+    unique_list_of_lists(Remainder).                    % recurse through the rest of the lists
+
+lists_not_equal([], []) :- false.
+lists_not_equal([A | As], [B | Bs]) :-
+    A #= B,
+    lists_not_equal(As, Bs).
+lists_not_equal([A | _], [B | _]) :- A #\= B.
