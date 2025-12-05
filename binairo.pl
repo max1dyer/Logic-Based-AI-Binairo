@@ -30,6 +30,21 @@ no_triplets([A, B, C | Remainder]) :-
     no_triplets([B, C | Remainder]).    % remove first element and check rest of list
 triplet_equal(A, A, A).
 
+% constrain board so all rows and columns have the same numbers of 1s and the same numbers of 0s
+equality_constraint(Rows, Cols) :-
+    maplist(equal_one_zero, Rows),
+    maplist(equal_one_zero, Cols).
+equal_one_zero(List) :-
+    count_entries(List, Count0, Count1),
+    Count0 =:= Count1.
+count_entries([], 0, 0).
+count_entries([0|Remainder], Count0, Count1) :-
+    count_entries(Remainder, New0, Count1),
+    Count0 is New0 + 1.
+count_entries([1|Remainder], Count0, Count1) :-
+    count_entries(Remainder, Count0, New1),
+    Count1 is New1 + 1.
+
 % constrain the board so all rows are unique and all columns are unique
 uniqueness_constraint(Rows, Cols) :-
     unique(Rows),
