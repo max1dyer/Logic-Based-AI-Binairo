@@ -5,7 +5,20 @@
 % 1 1
 % 0 1
 
-binairo(Rows, Dimension) :- 
+test() :- 
+    puzzle(1, Rows),
+    binairo(Rows, 4, Solution),
+    maplist(portray_clause, Solution).
+
+puzzle(1, [
+    [1, _, _, 0],
+    [_, _, _, _],
+    [_, _, _, _],
+    [0, _, _, 1]
+]).
+
+binairo(Rows, Dimension, Solution) :- 
+    append(Rows, Vars), Vars ins 0..1,          % all variables are either 0 or 1
     length(Rows, Dimension),                % number of rows is equal to the Dimension
     maplist(same_length(Dimension), Rows),  % ensure all lists are of length Dimension / number of columns is equal to the Dimension
     transpose(Rows, Cols),                  % creates list of lists to represent columns
@@ -13,7 +26,9 @@ binairo(Rows, Dimension) :-
     % constrain rows and columns to not allow three in a row of 1s or 0
     triplet_constraint(Rows, Cols),
     equality_constraint(Rows, Cols),
-    uniqueness_constraint(Rows, Cols).
+    % uniqueness_constraint(Rows, Cols),
+
+    Solution = Rows.
 
 % check if List is length L
 same_length(L, List) :-
@@ -24,31 +39,38 @@ same_length(L, List) :-
 triplet_constraint(Rows, Cols) :-
     maplist(no_triplets, Rows),
     maplist(no_triplets, Cols).
-no_triplets([_, _]).                    % base case -- lists of length 2 cannot have triplets
+
+no_triplets([_, _]).                    % lists of length 2 cannot have triplets
 no_triplets([A, B, C | Remainder]) :- 
-    \+ triplet_equal(A, B, C),          % check first three elements are not equal
+    A + B + C #\= 0,                    % not three 0s
+    A + B + C #\= 3,                    % not three 1s
     no_triplets([B, C | Remainder]).    % remove first element and check rest of list
-triplet_equal(A, A, A).
 
 % constrain board so all rows and columns have the same numbers of 1s and the same numbers of 0s
 equality_constraint(Rows, Cols) :-
-    maplist(equal_one_zero, Rows),
-    maplist(equal_one_zero, Cols).
-equal_one_zero(List) :-
-    count_entries(List, Count0, Count1),
-    Count0 =:= Count1.
-count_entries([], 0, 0).
-count_entries([0|Remainder], Count0, Count1) :-
-    count_entries(Remainder, New0, Count1),
-    Count0 is New0 + 1.
-count_entries([1|Remainder], Count0, Count1) :-
-    count_entries(Remainder, Count0, New1),
-    Count1 is New1 + 1.
+    maplist(limit_half, Rows),
+    maplist(limit_half, Cols).
+
+limit_half(List) :-
+    count(0, List, Count0),
+    count(1, List, Count1),
+    Count0 #= Count1.
+
+compare_counts(CountA, CountB) :- CountA =:= CountB.
+count(_, [], 0).
+count(Var, [X|Remainder], Count) :- 
+    X #= Var,
+    count(Var, Remainder, OldCount),
+    Count is OldCount + 1.
+count(Var, [X|Remainder], Count) :- 
+    X #\= Var,
+    count(Var, Remainder, Count).
 
 % constrain the board so all rows are unique and all columns are unique
 uniqueness_constraint(Rows, Cols) :-
     unique(Rows),
     unique(Cols).
+
 unique([]).
 unique([List1 | Remainder]) :-
     \+ member(List1, Remainder),        % check if no other list matches List1
