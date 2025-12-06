@@ -44,7 +44,7 @@ binairo_solver(Rows, Dimension) :-
     equality_constraint(Rows, Cols),
     uniqueness_constraint(Rows, Cols),
 
-    labeling([ffc, bisect], Vars).
+    labeling([ffc, bisect], Vars).              % put in values for any remaining _
 
 % check if List is length L
 same_length(L, List) :- length(List, L).
