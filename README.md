@@ -14,4 +14,4 @@ To run:
 4. Run one of the preset demonstration puzzles -- binairo_demo('EXAMPLE NUMBER').
 5. Run a board of your own design, see the demonstration puzzles for specifics on board layout -- binairo('BOARD', 'LENGTH OF BOARD').
 
-To see the official write up for this project see the pdf write-up.
+To see the official write up for this project see the Binairo pdf.
