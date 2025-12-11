@@ -7,6 +7,11 @@ Binairo is a logic puzzle played on an even-numbered square grid. Each cell is e
 2. No row or column can contain 000 or 111
 3. No two rows or two columns may be identical
 
-To run, open SWI-Prolog, change working directory to the folder with binairo.pl, load the file ([binairo].), and then call test(...) or solve with your own board.
+To run:
+1. Open SWI-Prolog
+2. Change working directory to the folder with binairo.pl -- working_directory(_, 'PUT DIRECTORY HERE').
+3. Load the file -- [binairo].
+4. Run one of the preset demonstration puzzles -- binairo_demo('EXAMPLE NUMBER').
+5. Run a board of your own design, see the demonstration puzzles for specifics on board layout -- binairo('BOARD', 'LENGTH OF BOARD').
 
 To see the official write up for this project see the pdf write-up.

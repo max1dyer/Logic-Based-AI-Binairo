@@ -17,23 +17,23 @@
 \maketitle
 
 \section{Introduction}
-Binairo is a logic puzzle in which a board can be filled in with 0s and 1s using the pre-filled values and logic rules. This project implements a solver for Binairo using Prolog's \texttt{clpfd} library. The purpose of this project is to explore how constraint programming can solve deterministic logic puzzles without brute-force search.
+Binairo is a logic puzzle in which a board can be filled in with two kinds of item, often 1s and 0s. The positions of these values are found using pre-filled hint values and logical constraints. This project implements a solver for Binairo using Prolog's \texttt{clpfd} library. The purpose of this project is to explore how constraint programming can solve deterministic logic puzzles without brute-force search.
 
 \section{Problem Description}
 Binairo is a logic puzzle played on an even-sized grid of 0s and 1s. The rules of the puzzle are as follows:
 \begin{enumerate}
     \item Each row and column must contain an equal number of 0s and 1s
-    \item No row or column can contain 000 or 111
+    \item No row or column can contain three 0s or 1s in a row
     \item No two rows or two columns may be identical
 \end{enumerate}
 A puzzle starts with some pre-filled cells, and the task is to infer the remaining numbers using logic.\\
 
-\noindent We use Prolog constraint programming to fill in the board. Since Binairo is a logic puzzle, it's rules map naturally to arithmetic constraints.\\
+\noindent We use Prolog constraint programming to fill in the board. Since Binairo is a logic puzzle, its rules map naturally to arithmetic constraints.\\
 
 \noindent Our solver is designed to handle any even square boards with a few filled in values. If a board is ambiguous in whether a 0 or 1 should be placed in certain spots, our solver will search for multiple solutions. Two puzzles have been given as examples but any board fitting the above requirements will work. If no solution exists, our solver will return false.
 
 \section{Approach and Methods}
-The solver expresses Binairo rules as finite-domain constraints over lists of Prolog variables. The board is represented as a list of lists (Rows), where each row is a list of 0s, 1s, or \_s for unfilled values. Using CLP(FD), the variables are assigned a 0 or 1 to satisfy all constraints. Each rule maps to a constraint.
+The solver expresses Binairo rules as finite-domain constraints over lists of Prolog variables. The board is represented as a list of lists (Rows), where each row is a list of 0s, 1s, or \_s for unfilled values. CLP(FD) allows for unfilled values to be assigned across a defined domain, expanding Prolog's base capabilities of logical evaluation to logical application. This means the program can set unfilled values to whatever values satisfy the specified constraints, which results in solving behaviour. Each rule maps to a constraint.
 
 \subsection{Representation}
 The puzzle is represented as
@@ -57,7 +57,7 @@ The \texttt{no\_triplets/1} predicate enforces that no three consecutive values 
 A + B + C #\= 0
 A + B + C #\= 3
 \end{verbatim}
-By summing the three values, the solver can detect rule-breaking patterns easily.
+By summing the three values, the solver can detect and avoid rule-breaking patterns easily.
 
 \subsection{Equal Numbers of 0s and 1s Constraint}
 To enforce equal numbers in a list:
@@ -66,17 +66,23 @@ sum(List, #=, Ones),
 length(List, L),
 Ones #= L // 2.
 \end{verbatim}
-Since the board dimension is always even, each row and column must contain exactly half 1s. 
+Since the board dimension is always even, each row and column must contain 1s equal to exactly half the length. By default, this results in the remaining half of values being assigned to 0s, resulting in equality. 
 
 \subsection{Uniqueness Constraint}
-To ensure no two rows or columns are identical, the solver  recursively compares matching elements until it finds a mismatch, or fails if the lists are identical.
+To ensure no two rows or columns are identical, the solver compares every row/column to every subsequent row/column. For each row column pair, the following is checked:
+\begin{verbatim}
+lists_not_equal([], []) :- false.
+lists_not_equal([A | As], [A | Bs]) :- lists_not_equal(As, Bs).
+lists_not_equal([A | _], [B | _]) :- A #\= B.
+\end{verbatim}
+Each element of both rows are recursively compared. If a match is found, the comparison continues. If either a mismatch or an unfilled value/value pair is found, it is confirmed or enforced that the values are different. If the entirety of both lists are compared and no differences are found, the lists are identical and the constraint fails.
 
 \subsection{Labeling Strategy}
 After all constraints are established, the solver calls:
 \begin{verbatim}
 labeling([ffc, bisect], Vars).
 \end{verbatim}
-The \textbf{ffc} (first-fail) selects the most constrained variable first to maximize early searching. The \textbf{bisect} splits domains to avoid deep search. These heuristics are used to improve performance on large boards.
+The \textbf{ffc} (first-fail) selects the most constrained variable first to maximize early searching. The \textbf{bisect} splits domains to avoid deep search. These search heuristics are used to improve performance on large boards.
 
 \section{Implementation}
 The implementation includes the puzzle input, constraint setup, and solution labeling.
@@ -99,7 +105,7 @@ This predicate does domain assignment, dimension checks, row-length validation, 
 Several helper predicates implement the puzzle rules:
 \begin{itemize}[noitemsep]
     \item \texttt{same\_length/2}: ensures consistent row length
-    \item \texttt{no\_triplets/1}: enforces forbidden patterns
+    \item \texttt{no\_triplets/1}: enforces forbidden patterns (triplets)
     \item \texttt{limit\_half/1}: ensures each row/column contains half 1s
     \item \texttt{lists\_not\_equal/2}: enforces row/column uniqueness
     \item \texttt{unique\_list\_of\_lists/1}: applies uniqueness to elements in list (pairwise)
@@ -108,35 +114,38 @@ Several helper predicates implement the puzzle rules:
 \subsection{Testing}
 The predicate:
 \begin{verbatim}
-test(N, M)
+binairo_demo(Puzzle Number)
 \end{verbatim}
 loads the given puzzle and calls the solver. Two puzzles are included under \texttt{puzzle/2}.
 
 \section{Results}
-discuss how it works on our test grids?, whether it finds solutions quickly, cases with ambiguous placements of 0/1?
+After development and optimization, the program can solve any Binairo puzzle commonly played by humans (from 4x4 to 12x12) near instantly. For puzzles with multiple possible solutions, the solver can identify all valid solutions.
 
 \section{Discussion}
-reflect on using CPL(FD) instead of brute force or binary constraints. talk about why we use prolog. how declaritive strengths simplify reasoning. maybe talk about how we decided to use prolog and not shadowprover.
+Compared to other solutions such as brute force, our method of constraint programming is far more efficient as it retains high solving speeds at larger grid sizes. We chose to work with CLP(FD), Prolog's Finite Domain constraints, over CLP(B), Prolog's Binary constraints, as the equal number of 1s and 0s constraints proved not fit cleanly into binary constraints. Prolog proved as the best option to develop in because the constraint programming options match the human solving patterns of recursively applying logic rules. This was compared to ShadowProver and Spectra, which have support for intensional and modal logics. Because Binairo is a game with complete information, tools handling logics of belief would have resulted in greater unneeded overhead and development difficulties. Overall, Prolog served to be highly effective for solving Binairo, as evidenced by the ease of matching strategy to the programming structure and speed of the solver.
 
 \section{Limitations and Future Work}
 Potential extensions include:
 \begin{itemize}[noitemsep]
     \item Puzzle generator
     \item Graphic visualization
-    \item Implement Tango (LinkedIn) Rules
+    \item Implement Binairo+ rules (inclusion of $=$ and $\times$ constraints)
 \end{itemize}
 
 \section{Conclusion}
-In conclusion, the Binairo solver successfully models and solves the puzzle using CLP(FD) constraints in Prolog. ...
+In conclusion, the Binairo solver successfully and efficiently models and solves the puzzle using CLP(FD) constraints in Prolog.
 
 \section{References}
-binairo and binairo rules - can we just cite wikepedia?\\
+\noindent For Binairo rules:
+\begin{itemize}
+\item Wikipedia, "Takuzu" \url{https://en.wikipedia.org/wiki/Takuzu}
+\end{itemize}
 
 \noindent For learning constraint programming:
 \begin{itemize}
-\item Triska, Markus. “Constraint Logic Programming over Integers in Prolog (CLP(Z)).” \url{https://www.metalevel.at/prolog/clpz}.
+\item Triska, Markus. “Constraint Logic Programming over Integers in Prolog (CLP(Z)).” \url{https://www.metalevel.at/Prolog/clpz}.
 
-\item SWI-Prolog Development Team. “CLP(FD) Arithmetic Constraints Documentation.” \url{https://www.swi-prolog.org/pldoc/man?section=clpfd-arith-constraints}.
+\item SWI-Prolog Development Team. “CLP(FD) Arithmetic Constraints Documentation.” \url{https://www.swi-Prolog.org/pldoc/man?section=clpfd-arith-constraints}.
 \end{itemize}
 
 \end{document}
